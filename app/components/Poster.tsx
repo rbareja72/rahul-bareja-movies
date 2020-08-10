@@ -1,6 +1,8 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import Animated from 'react-native-reanimated';
+import FastImage from 'react-native-fast-image';
+const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
 
 import type MovieType from '@app/types/Movie';
 
@@ -9,19 +11,23 @@ interface PosterProps {
     borderRadius?: Animated.Value<number>;
 }
 
-const Poster = ({borderRadius, movie}: PosterProps) => {
+const Poster = ({ borderRadius, movie }: PosterProps) => {
+    const [loading, setLoading] = React.useState(false);
     return (
         <>
-            <Animated.Image
-                source={{uri: movie.poster}}
-                style={[styles.image, {borderRadius: borderRadius || 8}]}
+            <AnimatedFastImage
+                source={{ uri: movie.poster }}
+                onLoadStart={() => setLoading(true)}
+                onLoad={() => setLoading(false)}
+                style={[styles.image, { borderRadius: borderRadius || 8 }]}
             />
             <View style={styles.content}>
                 <Text style={styles.name}>{movie.name}</Text>
                 <Text style={styles.reviews}>{`Reviews: ${
                     movie.reviews?.length || 0
-                }`}</Text>
+                    }`}</Text>
             </View>
+            {loading && <ActivityIndicator />}
         </>
     );
 };

@@ -1,4 +1,5 @@
 import type Review from './Review';
+import type Cast from './Cast';
 
 export default interface Movie {
     // change: id cannot be undefined
@@ -8,4 +9,5 @@ export default interface Movie {
     gender: string;
     description: string;
     reviews?: Array<Review>;
+    casts?: Array<Cast>;
 }
