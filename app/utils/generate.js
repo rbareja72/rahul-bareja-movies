@@ -1,8 +1,9 @@
 import 'react-native-get-random-values';
-import {times} from 'rambdax';
-import {v4 as uuid} from 'uuid';
+import { times } from 'rambdax';
+import { v4 as uuid } from 'uuid';
 import moviesData from '@data/Movies';
 import reviewsData from '@data/Reviews';
+import castsData from '@data/Casts';
 
 // Change: unneeded reduce
 const flatMap = (fn, arr) => arr.map(fn); //.reduce((a, b) => a.concat(b), []);
@@ -15,7 +16,7 @@ const fuzzCount = (count) => {
 };
 
 const makeRandomMovie = (i) => {
-    const movie = moviesData[i];
+    const movie = moviesData[Math.floor(Math.random() * (i + 1)) % moviesData.length];
     return {
         id: uuid(),
         ...movie,
@@ -36,10 +37,27 @@ const makeReviews = (movie, count) => {
     movie.reviews = reviews;
 };
 
-const generateMovies = (moviesCount, reviewsPerMovie) => {
+const makeRandomCast = (i) => {
+    const casts = {
+        id: uuid(),
+        body: castsData[i % castsData.length],
+    };
+
+    return casts;
+};
+
+const makeCast = (movie, count) => {
+    const casts = times((i) => makeRandomCast(i), count);
+    movie.casts = casts;
+};
+
+const generateMovies = (moviesCount, reviewsPerMovie, castPerMovie) => {
     const movies = times((i) => makeRandomMovie(i), moviesCount);
 
-    flatMap((movie) => makeReviews(movie, fuzzCount(reviewsPerMovie)), movies);
+    flatMap((movie) => {
+        makeReviews(movie, fuzzCount(reviewsPerMovie));
+        makeCast(movie, fuzzCount(castPerMovie));
+    }, movies);
 
     return movies;
 };

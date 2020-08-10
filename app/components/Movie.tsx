@@ -42,7 +42,7 @@ const measure = (ref: View): Promise<PositionType> =>
         ),
     );
 
-    // added use memo and 
+// added use memo
 const Movie = React.memo(
     ({ activeMovieId, index, movie, open }: MovieProps) => {
         const container = useRef<AnimatedView>(null);
@@ -56,31 +56,26 @@ const Movie = React.memo(
                 }
             });
         };
-
-        if (movie.name) {
-            console.log('RENDER MOVIE', movie.name);
-            return (
-                <TouchableWithoutFeedback onPress={startTransition}>
-                    <Animated.View
-                        ref={container}
-                        style={[
-                            styles.container,
-                            { opacity: cond(eq(activeMovieId, index), 0, 1) },
-                        ]}>
-                        <Poster movie={movie} />
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            );
-        } else {
-            return null;
-        }
+        console.log('RENDER MOVIE', movie.name + ' ' + index );
+        return (
+            <TouchableWithoutFeedback onPress={startTransition}>
+                <Animated.View
+                    ref={container}
+                    style={[
+                        styles.container,
+                        { opacity: cond(eq(activeMovieId, index), 0, 1) },
+                    ]}>
+                    <Poster movie={movie} />
+                </Animated.View>
+            </TouchableWithoutFeedback>
+        );
     }, (prevProps, nextProps) => {
         if (nextProps.activeMovieId !== prevProps.activeMovieId) {
             //  with self id
             if (cond(eq(nextProps.activeMovieId, nextProps.index), true, false)) {
                 return false;
             }
-            if (cond(eq(prevProps.activeMovieId, prevProps.index), true, false) && cond(eq(nextProps.activeMovieId, -1), true, false) ) {
+            if (cond(eq(prevProps.activeMovieId, prevProps.index), true, false) && cond(eq(nextProps.activeMovieId, -1), true, false)) {
                 return false;
             }
         }

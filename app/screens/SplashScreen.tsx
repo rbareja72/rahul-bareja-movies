@@ -1,11 +1,7 @@
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
-import React, {useRef, useCallback} from 'react';
-import {Animated, StatusBar, StyleSheet} from 'react-native';
-
-import generateMovies from '@utils/generate';
-
-import type Movie from '@app/types/Movie';
+import React, { useRef, useCallback } from 'react';
+import { Animated, StatusBar, StyleSheet } from 'react-native';
 
 const style = StyleSheet.create({
     container: {
@@ -28,10 +24,9 @@ const Splash = () => {
             duration: 200,
             useNativeDriver: true,
         }).start(() => {
-            const movies: Array<Movie> = generateMovies(25, 5);
             navigation.reset({
                 index: 0,
-                routes: [{name: 'Start', params: {movies}}],
+                routes: [{ name: 'Start' }],
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,7 +35,7 @@ const Splash = () => {
     return (
         <>
             <StatusBar barStyle="dark-content" />
-            <Animated.View style={[style.container, {transform: [{scale}]}]}>
+            <Animated.View style={[style.container, { transform: [{ scale }] }]}>
                 <LottieView
                     source={require('../assets/splash.json')}
                     style={style.flex}
