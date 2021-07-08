@@ -4,7 +4,8 @@ import {v4 as uuid} from 'uuid';
 import moviesData from '@data/Movies';
 import reviewsData from '@data/Reviews';
 
-const flatMap = (fn, arr) => arr.map(fn).reduce((a, b) => a.concat(b), []);
+// Change: unneeded reduce
+const flatMap = (fn, arr) => arr.map(fn); //.reduce((a, b) => a.concat(b), []);
 
 const fuzzCount = (count) => {
     // makes the number randomly a little larger or smaller for fake data to seem more realistic

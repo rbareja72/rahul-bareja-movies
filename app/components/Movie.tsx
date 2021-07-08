@@ -1,8 +1,14 @@
+/* eslint-disable prettier/prettier */
 import memoize from 'memoize-one';
-import React, {useRef} from 'react';
-import {StyleSheet, useWindowDimensions, View} from 'react-native';
-import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
-import Animated, {cond, eq} from 'react-native-reanimated';
+import React, { useRef } from 'react';
+import {
+    StyleSheet,
+    useWindowDimensions,
+    View,
+    InteractionManager,
+    TouchableWithoutFeedback,
+} from 'react-native';
+import Animated, { cond, eq } from 'react-native-reanimated';
 
 import Poster from './Poster';
 
@@ -36,32 +42,50 @@ const measure = (ref: View): Promise<PositionType> =>
         ),
     );
 
-const Movie = ({activeMovieId, index, movie, open}: MovieProps) => {
-    const container = useRef<AnimatedView>(null);
-    const {width, height} = useWindowDimensions();
-    const styles = getStyles(width, height);
-    const startTransition = async () => {
-        if (container.current) {
-            const position = await measure(container.current.getNode());
-            open(index, movie, position);
+    // added use memo and 
+const Movie = React.memo(
+    ({ activeMovieId, index, movie, open }: MovieProps) => {
+        const container = useRef<AnimatedView>(null);
+        const { width, height } = useWindowDimensions();
+        const styles = getStyles(width, height);
+        const startTransition = () => {
+            InteractionManager.runAfterInteractions(async () => {
+                if (container.current) {
+                    const position = await measure(container.current.getNode());
+                    open(index, movie, position);
+                }
+            });
+        };
+
+        if (movie.name) {
+            console.log('RENDER MOVIE', movie.name);
+            return (
+                <TouchableWithoutFeedback onPress={startTransition}>
+                    <Animated.View
+                        ref={container}
+                        style={[
+                            styles.container,
+                            { opacity: cond(eq(activeMovieId, index), 0, 1) },
+                        ]}>
+                        <Poster movie={movie} />
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+            );
+        } else {
+            return null;
         }
-    };
-
-    console.log('RENDER MOVIE', movie.name);
-
-    return (
-        <TouchableWithoutFeedback onPress={startTransition}>
-            <Animated.View
-                ref={container}
-                style={[
-                    styles.container,
-                    {opacity: cond(eq(activeMovieId, index), 0, 1)},
-                ]}>
-                <Poster movie={movie} />
-            </Animated.View>
-        </TouchableWithoutFeedback>
-    );
-};
+    }, (prevProps, nextProps) => {
+        if (nextProps.activeMovieId !== prevProps.activeMovieId) {
+            //  with self id
+            if (cond(eq(nextProps.activeMovieId, nextProps.index), true, false)) {
+                return false;
+            }
+            if (cond(eq(prevProps.activeMovieId, prevProps.index), true, false) && cond(eq(nextProps.activeMovieId, -1), true, false) ) {
+                return false;
+            }
+        }
+        return true;
+    });
 
 const getStyles = memoize((width: number, height: number) =>
     StyleSheet.create({
